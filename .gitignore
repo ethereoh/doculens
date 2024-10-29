@@ -1,3 +1,9 @@
+models/
+dataset/
+.milvus_demo.db.lock
+milvus_demo.db
+Modelfile
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
