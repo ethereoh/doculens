@@ -1,33 +1,41 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import torch
-
-SUPPORTED_MODELS = {
-    "llama_3_1_8b": "unsloth/Meta-Llama-3.1-8B-bnb-4bit",  # Llama-3.1 2x faster
-    "llama_3_1_8b_instruct": "unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit",
-    "llama_3_1_70b": "unsloth/Meta-Llama-3.1-70B-bnb-4bit",
-    "llama_3_1_405b": "unsloth/Meta-Llama-3.1-405B-bnb-4bit",  # 4bit for 405b!
-    "mistral_small_instruct": "unsloth/Mistral-Small-Instruct-2409",  # Mistral 22b 2x faster!
-    "mistral_7b_instruct": "unsloth/mistral-7b-instruct-v0.3-bnb-4bit",
-    "phi_3_5_mini_instruct": "unsloth/Phi-3.5-mini-instruct",  # Phi-3.5 2x faster!
-    "phi_3_medium_4k_instruct": "unsloth/Phi-3-medium-4k-instruct",
-    "gemma_2_9b": "unsloth/gemma-2-9b-bnb-4bit",
-    "gemma_2_27b": "unsloth/gemma-2-27b-bnb-4bit",  # Gemma 2x faster!
-    "llama_3_2_1b": "unsloth/Llama-3.2-1B-bnb-4bit",  # NEW! Llama 3.2 models
-    "llama_3_2_1b_instruct": "unsloth/Llama-3.2-1B-Instruct-bnb-4bit",
-    "llama_3_2_3b": "unsloth/Llama-3.2-3B-bnb-4bit",
-    "llama_3_2_3b_instruct": "unsloth/Llama-3.2-3B-Instruct-bnb-4bit",
-}  # More models at https://huggingface.co/unsloth
 
 
 @dataclass
 class Config:
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
+    
+
+@dataclass
+class ModelConfig(Config):
+    model_name: str = "keepitreal/vietnamese-sbert"
 
 
 @dataclass
-class FinetuneConfig(Config):
-    max_seq_length = 2048  # Choose any! We auto support RoPE Scaling internally!
-    dtype = None  # None for auto detection. Float16 for Tesla T4, V100, Bfloat16 for Ampere+
-    load_in_4bit = True  # Use 4bit quantization to reduce memory usage. Can be False.
-    model_name = SUPPORTED_MODELS["llama_3_2_3b"]
+class DatasetConfig: 
+    data_root : str = './db'
+    corpus_dir: str =  f"{data_root}/corpus.csv"
+    train_dir: str = f"{data_root}/train.csv" 
+    vector_src_dir: str = f"{data_root}/vector_db_src.csv"
+    public_test_dir: str = f"{data_root}/public_test.csv"
+
+@dataclass
+class MilvusDBConfig:
+    db_name: str = "bkai_milvus.db" # Change this to place the db to where you want
+    collection_name: str = "bkai_vectordb"
+    limit: int = 10  # This is the contest's requirements
+    output_fields : list = field(default_factory=lambda : ['question', 'context', 'cid'])
+    metric_type: str = "COSINE" # Possible values are IP, L2, COSINE, JACCARD, and HAMMING
+
+
+    # More details at: https://milvus.io/api-reference/pymilvus/v2.4.x/MilvusClient/Vector/search.md
+    params : dict = field(default_factory=lambda :  {})
+
+    # Dataset config: this part requires dataset's EDA. 
+    dimension: int = 768 # Length of the embedding vector (1, embed_len)
+    primary_field_name: str ="id",
+    id_type:str ="int",
+    vector_field_name: str ="embeddings",
+    auto_id: bool =False,

@@ -1,7 +1,5 @@
 models/
-dataset/
-.milvus_demo.db.lock
-milvus_demo.db
+db/
 Modelfile
 
 # Byte-compiled / optimized / DLL files

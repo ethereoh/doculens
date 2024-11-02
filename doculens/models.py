@@ -1,39 +1,49 @@
-from unsloth import FastLanguageModel
+import torch
+from transformers import AutoTokenizer, AutoModel
 
-from .config import FinetuneConfig
+from .config import ModelConfig
 
 
-class Model(object):
-    def __init__(self, config=FinetuneConfig(), auto: bool = True):
-        self.model, self.tokenizer = FastLanguageModel.from_pretrained(
-            model_name=config.model_name,  # or choose "unsloth/Llama-3.2-1B-Instruct"
-            max_seq_length=config.max_seq_length,
-            dtype=config.dtype,
-            load_in_4bit=config.load_in_4bit,
+class EmbeddingModel:
+
+    def __init__(self):
+
+        self.config = ModelConfig()
+        self.model, self.tokenizer = self._init_model(
+            model_name=self.config.model_name, device=self.config.device
         )
 
-        if auto:
-            self.model = self._quantize_model(self.model)
+    def _init_model(self, model_name: str, device: str) -> tuple:
+        "Initialize model"
+        model = AutoModel.from_pretrained(model_name).to(device)
+        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        return (model, tokenizer)
 
-    def _quantize_model(self, model):
-        return FastLanguageModel.get_peft_model(
-            model,
-            r=32,  # Choose any number > 0 ! Suggested 8, 16, 32, 64, 128
-            target_modules=[
-                "q_proj",
-                "k_proj",
-                "v_proj",
-                "o_proj",
-                "gate_proj",
-                "up_proj",
-                "down_proj",
-            ],
-            lora_alpha=32,
-            lora_dropout=0,  # Supports any, but = 0 is optimized
-            bias="none",  # Supports any, but = "none" is optimized
-            # [NEW] "unsloth" uses 30% less VRAM, fits 2x larger batch sizes!
-            use_gradient_checkpointing="unsloth",  # True or "unsloth" for very long context
-            random_state=3407,
-            use_rslora=False,  # We support rank stabilized LoRA
-            loftq_config=None,  # And LoftQ
+    # Mean Pooling - Take attention mask into account for correct averaging
+    def _mean_pooling(self, model_output, attention_mask):
+        token_embeddings = model_output[
+            0
+        ]  # First element of model_output contains all token embeddings
+        input_mask_expanded = (
+            attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
         )
+        return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(
+            input_mask_expanded.sum(1), min=1e-9
+        )
+
+    # TODO: make hyperparameters read from a declarative file.
+    def embed(self, payload: str | list[str]):
+        tokenized_input = self.tokenizer(
+            payload, padding=True, truncation=True, return_tensors="pt"
+        ).to(self.config.device)
+        with torch.no_grad():
+            model_output = self.model(**tokenized_input)
+
+        embedding_outputs = (
+            self._mean_pooling(model_output, tokenized_input["attention_mask"])
+            .detach()
+            .cpu()
+            .numpy()
+        )
+
+        return embedding_outputs
