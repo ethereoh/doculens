@@ -36,7 +36,7 @@ class MilvusDBConnection:
                     metric_type=self.config.metric_type
                     )
         except Exception as e: 
-            raise pymilvus.exceptions.CollectionNotExistException() from e
+            raise e
 
 
     def drop_collection(self):

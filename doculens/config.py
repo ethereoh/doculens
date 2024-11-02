@@ -23,11 +23,13 @@ class DatasetConfig:
 
 @dataclass
 class MilvusDBConfig:
-    db_name: str = "bkai_milvus.db" # Change this to place the db to where you want
+    data_root : str = './db'
+
+    db_name: str = f"bkai_milvus.db" # Change this to place the db to where you want
     collection_name: str = "bkai_vectordb"
-    limit: int = 10  # This is the contest's requirements
+    limit: int = 20  # This is top_k results
     output_fields : list = field(default_factory=lambda : ['question', 'context', 'cid'])
-    metric_type: str = "COSINE" # Possible values are IP, L2, COSINE, JACCARD, and HAMMING
+    metric_type: str = "L2" # Possible values are IP, L2, COSINE, JACCARD, and HAMMING
 
 
     # More details at: https://milvus.io/api-reference/pymilvus/v2.4.x/MilvusClient/Vector/search.md
@@ -35,7 +37,7 @@ class MilvusDBConfig:
 
     # Dataset config: this part requires dataset's EDA. 
     dimension: int = 768 # Length of the embedding vector (1, embed_len)
-    primary_field_name: str ="id",
-    id_type:str ="int",
-    vector_field_name: str ="embeddings",
-    auto_id: bool =False,
+    primary_field_name: str ="id"
+    id_type:str ="int"
+    vector_field_name: str ="embeddings"
+    auto_id: bool = False

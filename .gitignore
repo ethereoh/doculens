@@ -1,5 +1,6 @@
 models/
-db/
+dataset/
+doculens/experimentals
 Modelfile
 
 # Byte-compiled / optimized / DLL files

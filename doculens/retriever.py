@@ -26,30 +26,33 @@ class DoculensRetreiver:
         self.embedding_model = embedding_model
 
         # Setup MilvusDB Connection
-        connection = MilvusDBConnection(config=mlv_conf)
-        connection.create_collection()
+        self.connection = MilvusDBConnection(config=mlv_conf)
+        self.connection.create_collection()
 
-        self.client = connection.client
+        self.client = self.connection.client
 
         self.setup_db()
 
     def setup_db(self):
         "Create an instance to database"
 
-        # 1. Convert embedding value from string to float
-        vector_df = pd.read_csv(self.DS_CONFIG.vector_src_dir, index_col=0) 
-        vector_df['embeddings'] = vector_df['embeddings'].apply(lambda x: self._convert_string_to_float_df(x))
+        if self.connection.check_collection(): 
+            return "Collection is created"
+        else: 
+            # 1. Convert embedding value from string to float
+            vector_df = pd.read_csv(self.ds_conf.vector_src_dir, index_col=0) 
+            vector_df['embeddings'] = vector_df['embeddings'].apply(lambda x: self._convert_string_to_float_df(x))
 
-        for batch in process_data_in_batches(vector_df, batch_size=1000):
-            data = [batch.iloc[idx].to_dict() for idx in range(len(batch))]
+            for batch in process_data_in_batches(vector_df, batch_size=1000):
+                data = [batch.iloc[idx].to_dict() for idx in range(len(batch))]
 
-            # Insert records
-            res = self.client.insert(
-                collection_name=self.mlv_conf.collection_name,
-                data=data
-            )
+                # Insert records
+                self.client.insert(
+                    collection_name=self.mlv_conf.collection_name,
+                    data=data
+                )
 
-            print(res) 
+                # print(res) 
 
     def retrieve(self, query: str | list[str]) -> dict:
         "Retrieve an instance"
@@ -59,6 +62,7 @@ class DoculensRetreiver:
             'metric_type': self.mlv_conf.metric_type, 
             'params': self.mlv_conf.params
         }
+
         result = self.client.search(
             collection_name=self.mlv_conf.collection_name, 
             data=sentence_embedding, 
@@ -66,15 +70,14 @@ class DoculensRetreiver:
             output_fields=self.mlv_conf.output_fields, 
             search_params=search_params
         )
-        assert result[0] == dict
-        return result[0]
+        return result
 
     def _convert_string_to_float_df(self, sample): 
         # Remove quotes and square brackets
         string = sample[1:-1]  # Remove the first and last characters
 
         # Split the string into a list of strings
-        float_strings = string.split()
+        float_strings = string.split(', ')
 
         # Convert each string to a float
         float_list = [float(s) for s in float_strings]

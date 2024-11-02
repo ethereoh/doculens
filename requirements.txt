@@ -1,7 +1,4 @@
-datasets==3.0.2
 pandas==2.2.3
+pymilvus==2.4.9
 torch==2.5.0+cu118
-tqdm==4.66.6
 transformers==4.44.2
-trl==0.11.1
-unsloth==2024.10.7
