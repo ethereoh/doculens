@@ -23,18 +23,15 @@ class MilvusDBConnection:
 
     def create_collection(self): 
         try: 
-            if self.check_collection():
-                pass
-            else: 
-                self.client.create_collection(
-                    collection_name=self.config.collection_name,
-                    dimension=self.config.dimension,
-                    primary_field_name=self.config.primary_field_name,
-                    id_type=self.config.id_type,
-                    vector_field_name=self.config.vector_field_name,
-                    auto_id=self.config.auto_id,                
-                    metric_type=self.config.metric_type
-                    )
+            self.client.create_collection(
+                collection_name=self.config.collection_name,
+                dimension=self.config.dimension,
+                primary_field_name=self.config.primary_field_name,
+                id_type=self.config.id_type,
+                vector_field_name=self.config.vector_field_name,
+                auto_id=self.config.auto_id,                
+                metric_type=self.config.metric_type
+                )
         except Exception as e: 
             raise e
 

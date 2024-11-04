@@ -3,7 +3,7 @@ This script is for data manipulation:
     1. Move data from dataset into milvus. 
     2. Retrieve by similarity search.
 """
-
+import logging
 import pandas as pd
 
 from .config import MilvusDBConfig, DatasetConfig
@@ -37,32 +37,36 @@ class DoculensRetreiver:
         "Create an instance to database"
 
         if self.connection.check_collection(): 
-            return "Collection is created"
+            print("Database is created!")
         else: 
             # 1. Convert embedding value from string to float
+            print("Convert embedding value from string to float")
             vector_df = pd.read_csv(self.ds_conf.vector_src_dir, index_col=0) 
             vector_df['embeddings'] = vector_df['embeddings'].apply(lambda x: self._convert_string_to_float_df(x))
 
+            print("Insert data by batch")
             for batch in process_data_in_batches(vector_df, batch_size=1000):
                 data = [batch.iloc[idx].to_dict() for idx in range(len(batch))]
 
                 # Insert records
-                self.client.insert(
+                res = self.client.insert(
                     collection_name=self.mlv_conf.collection_name,
                     data=data
                 )
 
-                # print(res) 
+                print(res) 
 
     def retrieve(self, query: str | list[str]) -> dict:
         "Retrieve an instance"
         ...
+        print("Embedding query")
         sentence_embedding = self.embedding_model.embed(query)
         search_params = {
             'metric_type': self.mlv_conf.metric_type, 
             'params': self.mlv_conf.params
         }
 
+        print("Semantic search")
         result = self.client.search(
             collection_name=self.mlv_conf.collection_name, 
             data=sentence_embedding, 

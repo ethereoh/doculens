@@ -15,7 +15,7 @@ class ModelConfig(Config):
 
 @dataclass
 class DatasetConfig: 
-    data_root : str = './db'
+    data_root : str = './dataset'
     corpus_dir: str =  f"{data_root}/corpus.csv"
     train_dir: str = f"{data_root}/train.csv" 
     vector_src_dir: str = f"{data_root}/vector_db_src.csv"
@@ -23,13 +23,13 @@ class DatasetConfig:
 
 @dataclass
 class MilvusDBConfig:
-    data_root : str = './db'
+    data_root : str = './dataset'
 
-    db_name: str = f"bkai_milvus.db" # Change this to place the db to where you want
+    db_name: str = f"{data_root}/bkai_milvus.db" # Change this to place the db to where you want
     collection_name: str = "bkai_vectordb"
-    limit: int = 20  # This is top_k results
+    limit: int = 30  # This is top_k results
     output_fields : list = field(default_factory=lambda : ['question', 'context', 'cid'])
-    metric_type: str = "L2" # Possible values are IP, L2, COSINE, JACCARD, and HAMMING
+    metric_type: str = "COSINE" # Possible values are IP, L2, COSINE, JACCARD, and HAMMING
 
 
     # More details at: https://milvus.io/api-reference/pymilvus/v2.4.x/MilvusClient/Vector/search.md
