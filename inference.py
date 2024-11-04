@@ -1,3 +1,5 @@
+import logging 
+
 import pandas as pd
 
 from doculens.retriever import DoculensRetreiver
@@ -10,13 +12,19 @@ from doculens.config import DatasetConfig
 ds_conf = DatasetConfig()
 
 # Setup Retriever
+logging.info('Setting Doculens Retriever')
 embedding_model = EmbeddingModel()
 retriever = DoculensRetreiver(embedding_model=embedding_model)
 
 
 # Setup public test
+logging.info('Reading Dataframe')
 corpus_df = pd.read_csv(ds_conf.corpus_dir)
 test_df = pd.read_csv(ds_conf.public_test_dir)
+
+
+# Start getting results from public test
+logging.info('Start Infering: Answering legal questions')
 result_dict = {
     'question': [], 
     'qid': [],
@@ -24,8 +32,6 @@ result_dict = {
     'cid': []
 }
 
-
-# Start getting results from public test
 for batch in process_data_in_batches(test_df, batch_size=1000): 
 
     # Iterate via each instance in batch

@@ -9,3 +9,20 @@
 # Optimize Docker
 
 1. [Reduce docker image size from 1GB to 150mb | Method to optimize docker images](https://www.kubeblogs.com/reduce-docker-image-size/)
+
+
+
+# Requirements
+
+## RAG
+
+### Retrieval
+
+- Language model
+    Hieu noi dung nguoi dug
+    Hieu cach phan tich 
+
+-> Prompt Engineer:  
+-> Finetuning: 
+
+### Generator
