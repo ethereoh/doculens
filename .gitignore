@@ -1,3 +1,16 @@
+models/
+db/.bkai_milvus.db.lock
+db/bkai_milvus.db
+db/corpus.csv
+db/preprocessed_train.csv
+db/public_test.csv
+db/readme.txt
+db/train.csv
+db/vector_db_src.csv
+
+doculens/experimentals
+Modelfile
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

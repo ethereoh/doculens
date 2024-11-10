@@ -1,0 +1,2 @@
+- [ ] Changing config to get 10 different results from the retriever.
+- [ ] Add LLM to upda
