@@ -1,14 +1,15 @@
 import torch
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoModel, AutoTokenizer
 
-from .config import ModelConfig
+from .config import EmbeddingConfig
 
 
 class EmbeddingModel:
 
-    def __init__(self):
+    def __init__(self, config: EmbeddingConfig):
 
-        self.config = ModelConfig()
+        # self.config = EmbeddingModel()
+        self.config = config
         self.model, self.tokenizer = self._init_model(
             model_name=self.config.model_name, device=self.config.device
         )
@@ -32,7 +33,7 @@ class EmbeddingModel:
         )
 
     # TODO: make hyperparameters read from a declarative file.
-    def embed(self, payload: str | list[str]):
+    def invoke(self, payload: str | list[str]):
         tokenized_input = self.tokenizer(
             payload, padding=True, truncation=True, return_tensors="pt"
         ).to(self.config.device)

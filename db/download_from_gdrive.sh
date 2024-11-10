@@ -39,4 +39,4 @@ else
 fi
 
 
-python3 pip uninstall gdown
+python3 -m pip uninstall gdown
