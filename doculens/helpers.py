@@ -1,6 +1,17 @@
 import os
+import ast
+from dotenv import load_dotenv
 
-from tqdm import tqdm
+import pandas as pd
+
+load_dotenv()
+
+
+def setup_env_var(env_name: str):
+    try:
+        os.environ[env_name] = os.getenv(env_name)
+    except:
+        raise ImportError(f"Can not find {env_name} in .env file.")
 
 
 # This script is highly recommended for individuals that have limit computatation resources.
@@ -23,16 +34,20 @@ def get_env(env_name: str, default_name: str) -> str:
     return os.getenv(env_name) if os.getenv(env_name) else default_name
 
 
-def get_bkai_result_format(
-    dataset: list[str | int], output_dir="predict.txt", stdin_out: bool = True
-):
-    for idx in tqdm(
-        range(len(dataset)), desc="Start writing results into BKAI's format: ..."
-    ):
-        data = dataset[idx]
-        result = " ".join(str(data))
-        writer = open(output_dir, "a+")
-        writer.writelines(result + "\n")
-        if stdin_out:
-            print(f"{idx}./ Writing {result}")
-    print("Done")
+def get_bkai_result_format(input_csv_path, output_txt_path):
+    "Return results data from pandas into the format: qid cid1 cid2 ..."
+    # Load data
+    result_df = pd.read_csv(input_csv_path, index_col=False)
+
+    # Parse 'cid' strings to lists
+    result_df["cid"] = result_df["cid"].apply(ast.literal_eval)
+
+    # Build the output lines
+    lines = [
+        f"{q} " + " ".join(map(str, cid)) + "\n"
+        for q, cid in zip(result_df["qid"], result_df["cid"])
+    ]
+
+    # Write all lines to file at once
+    with open(output_txt_path, "w") as file:
+        file.writelines(lines)
