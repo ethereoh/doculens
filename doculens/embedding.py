@@ -1,8 +1,7 @@
 import torch
 from transformers import AutoModel, AutoTokenizer
 
-
-from base.agent import BaseAgent
+from .base.agent import BaseAgent
 from .config import EmbeddingConfig
 
 

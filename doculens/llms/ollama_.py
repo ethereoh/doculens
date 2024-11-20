@@ -4,14 +4,15 @@ import ollama
 
 from doculens.base.agent import BaseAgent
 
+
 class OllamaAgent(BaseAgent):
     def __init__(self, config):
         self.config = config
-        self.username='minhleduc0210'
+        self.username = "minhleduc0210"
         self.model_name = config.model_name or "qwen2.5:3b"
         self.system_prompt = self._set_system_prompt(self.config.system_prompt)
 
-    def _init_model(self): 
+    def _init_model(self):
         "If model exist, use, otherwise pull"
         ...
 
@@ -32,21 +33,20 @@ class OllamaAgent(BaseAgent):
 
         return response
 
-
     def prettify(self, payload):
-        response = payload['message']['content']
+        response = payload["message"]["content"]
         return response
-    
+
     def _check_model(self, model_name):
-        try: 
+        try:
             "Check if model exists"
             return ollama.show(model=model_name)
         except:
-            return 
+            return
 
-    def show_model(self) -> dict: 
+    def show_model(self) -> dict:
         return ollama.list()
-    
+
     def _set_system_prompt(self, payload):
         return (
             payload

@@ -43,12 +43,18 @@ class DoculensRetreiver:
 
         if self.connection.check_collection():
             # 1. Convert embedding value from string to float
-            # TODO: Make this part of code a different component: a parser.
             print("Convert embedding value from string to float")
             vector_df = pd.read_csv(self.ds_conf.vector_src_dir, index_col=0)
+
+            # vector_df = pd.read_csv(self.ds_conf.corpus_dir, index_col=0)
             vector_df["embeddings"] = vector_df["embeddings"].apply(
                 lambda x: self._convert_string_to_float_df(x)
             )
+            # print("Embedding context")
+            # for batch in process_data_in_batches(vector_df, batch_size=1000):
+            #     data = [batch.iloc[idx]['text'] for idx in range(len(batch))]
+            #     embedding_batches = self.embedding_model.invoke(data)
+            #     vector_embedding += embedding_batches
 
             print("Insert data by batch")
             for batch in process_data_in_batches(vector_df, batch_size=1000):
@@ -83,13 +89,7 @@ class DoculensRetreiver:
         return result
 
     def _convert_string_to_float_df(self, sample):
-        # Remove the open/close brackets
-        string = sample[1:-1]
-
-        # Split the string into a list of strings
-        float_strings = string.split(", ")
-
-        # Convert each string to a float
-        float_list = [float(s) for s in float_strings]
-
+        string_ = sample[2:-2]
+        float_strings = string_.replace("\n ", " ").split(" ")
+        float_list = [float(s) for s in float_strings if s != ""]
         return float_list
