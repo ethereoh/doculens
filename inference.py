@@ -1,11 +1,15 @@
 import logging
 
+import rerankers
 import pandas as pd
 
 from doculens.config import DatasetConfig, EmbeddingConfig
 from doculens.embedding import EmbeddingModel
 from doculens.helpers import process_data_in_batches
 from doculens.retriever import DoculensRetreiver
+from doculens.strategies import reranking
+
+ranker = rerankers.Reranker('cross-encoder', lang='vi')
 
 # Setup Config
 ds_conf = DatasetConfig()
@@ -28,6 +32,9 @@ print("Start Infering: Answering legal questions")
 
 idx = 0
 result = ""
+texts, cids = [], []
+output_dir = 'predict.txt'
+
 for batch in process_data_in_batches(test_df, batch_size=1000):
     print("[INFO] Inference on batch {idx}")
     # Iterate via each instance in batch
@@ -41,17 +48,26 @@ for batch in process_data_in_batches(test_df, batch_size=1000):
         result += f"{str(qid)} "
 
         search_result = retriever.retrieve(question)
+
         for res in search_result[0]:
             res_entity = res["entity"]
-            res_entity = res["entity"]
-            result += f"{res_entity["cid"]} "
+            texts.append(res_entity['text'])
+            cids.append(res_entity['cid'])
 
-        with open("predict.txt", "a+") as writer:
-            print(f"{idx} question-answer: {result}")
-            result += "\n"
+        reranked_result = reranking(query=question, 
+                            docs=texts, 
+                            doc_ids=cids)
+        
+        for r in reranked_result.results: 
+            result += f"{r.doc_id} "
+
+        with open(output_dir, 'a+') as writer: 
+            print(f"{idx} question: {result}")
+            result += '\n'
             writer.writelines(result)
-            print("=====" * 10)
+            print("======"*10)
         result = ""
+        texts, cids = [], []
     idx += 1
 
 

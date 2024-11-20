@@ -50,11 +50,6 @@ class DoculensRetreiver:
             vector_df["embeddings"] = vector_df["embeddings"].apply(
                 lambda x: self._convert_string_to_float_df(x)
             )
-            # print("Embedding context")
-            # for batch in process_data_in_batches(vector_df, batch_size=1000):
-            #     data = [batch.iloc[idx]['text'] for idx in range(len(batch))]
-            #     embedding_batches = self.embedding_model.invoke(data)
-            #     vector_embedding += embedding_batches
 
             print("Insert data by batch")
             for batch in process_data_in_batches(vector_df, batch_size=1000):

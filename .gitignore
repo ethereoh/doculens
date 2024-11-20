@@ -11,6 +11,9 @@ db/vector_db_src.csv
 doculens/experimentals
 Modelfile
 
+predict.txt
+predict.zip
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
