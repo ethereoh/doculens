@@ -13,4 +13,4 @@ Note: This is not recommend for Window users.
 
 ## Manually Setup
 
-Download Dataset via click to this link: https://drive.google.com/file/d/1J5mHrVv-Ge-kxx6cGYQoC0Skkmm4YmBk/view?usp=sharing
+Download Dataset via click to this link: https://drive.google.com/file/d/1koMl68Xqf83SPuBEVKKgITe7DMHmDC-3/view?usp=sharing
