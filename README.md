@@ -7,9 +7,21 @@ This repository contains our submission for the BKAI 2024 Legal Document Track. 
 
 Furthermore, Doculens provides an explainability layer by highlighting the specific passages within the retrieved documents that support the generated answer. This feature allows users to understand the reasoning behind the model's predictions and verify their accuracy against the original legal source material. We achieved an explainability score of 0.85 based on human evaluation, indicating a high degree of transparency and trustworthiness.
 
-## RAG Workflow
+## Workflow
 
-![](/assets/rag_baseline.webp)
+![](./assets/doculens_workflow.png)
+
+The workflow is illustrated as follow: 
+
+**Prepare stage**
+
+The corpus dataset is embedded and stored in a vector database (Milvus). 
+
+**Inference stage**
+
+1. Each query will be embedded by an embedding model. 
+2. The processed query will execute a semantic search to retrieve similar embedding vectors.
+3. Those similar vectors are then reranked using `cross-encoder` transformers models. 
 
 ## Usage 
 

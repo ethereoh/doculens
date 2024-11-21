@@ -21,9 +21,10 @@ class EmbeddingConfig(Config):
 #     top_k: int = 10
 
 
-# @dataclass
-# class RerankerConfig(Config):
-#     model_name: str
+@dataclass
+class RerankerConfig(Config):
+    model_name: str = "cross-encoder"
+    lang: str = "vi"
 
 
 @dataclass

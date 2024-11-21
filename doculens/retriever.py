@@ -4,8 +4,6 @@ This script is for data manipulation:
     2. Retrieve by similarity search.
 """
 
-import logging
-
 import pandas as pd
 
 from .config import DatasetConfig, EmbeddingConfig, MilvusDBConfig

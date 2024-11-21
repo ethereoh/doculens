@@ -1,7 +1,7 @@
 import logging
 
-import rerankers
 import pandas as pd
+import rerankers
 
 from doculens.config import DatasetConfig, EmbeddingConfig
 from doculens.embedding import EmbeddingModel
@@ -9,7 +9,7 @@ from doculens.helpers import process_data_in_batches
 from doculens.retriever import DoculensRetreiver
 from doculens.strategies import reranking
 
-ranker = rerankers.Reranker('cross-encoder', lang='vi')
+ranker = rerankers.Reranker("cross-encoder", lang="vi")
 
 # Setup Config
 ds_conf = DatasetConfig()
@@ -22,7 +22,6 @@ retriever = DoculensRetreiver()
 
 # Setup public test
 print("Reading Dataframe")
-corpus_df = pd.read_csv(ds_conf.corpus_dir)
 test_df = pd.read_csv(ds_conf.public_test_dir)
 
 
@@ -33,7 +32,7 @@ print("Start Infering: Answering legal questions")
 idx = 0
 result = ""
 texts, cids = [], []
-output_dir = 'predict.txt'
+output_dir = "predict.txt"
 
 for batch in process_data_in_batches(test_df, batch_size=1000):
     print("[INFO] Inference on batch {idx}")
@@ -51,21 +50,19 @@ for batch in process_data_in_batches(test_df, batch_size=1000):
 
         for res in search_result[0]:
             res_entity = res["entity"]
-            texts.append(res_entity['text'])
-            cids.append(res_entity['cid'])
+            texts.append(res_entity["text"])
+            cids.append(res_entity["cid"])
 
-        reranked_result = reranking(query=question, 
-                            docs=texts, 
-                            doc_ids=cids)
-        
-        for r in reranked_result.results: 
+        reranked_result = reranking(query=question, docs=texts, doc_ids=cids)
+
+        for r in reranked_result.results:
             result += f"{r.doc_id} "
 
-        with open(output_dir, 'a+') as writer: 
+        with open(output_dir, "a+") as writer:
             print(f"{idx} question: {result}")
-            result += '\n'
+            result += "\n"
             writer.writelines(result)
-            print("======"*10)
+            print("======" * 10)
         result = ""
         texts, cids = [], []
     idx += 1
